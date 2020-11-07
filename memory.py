@@ -39,6 +39,32 @@ def get_random_letters(letters, board):
                 index = 0
                 random.shuffle(letters_list)
 
+def display_board(board):
+    length = len(board[0])
+    header = string.ascii_uppercase[:length]
+
+    print("\n  " + header)
+    
+    index = 1
+
+    for row in board:
+        row_to_print = str(index) + " " + "".join(row)
+        print(row_to_print)
+        index += 1
+    
+def get_coords(col, row):
+
+    user_input = input("Provide your coords (Eg. a1, b4, etc...): ")
+
+    cols = string.ascii_lowercase[:col]
+
+    rows = list(range(row))
+    rows = map(lambda x: str(x+1), rows)
+
+    while len(user_input) != 2 or user_input[0].lower() not in cols and user_input[1] not in rows:
+        pass
+
+
 
 def main():
     col, row = difficulty_level()
@@ -47,17 +73,19 @@ def main():
     amount_of_letters = int(col * row / 2)
     letters = string.ascii_lowercase[:amount_of_letters]
     get_random_letters(letters, hidden_board)
+    display_board(visible_board)
+    get_coords()
 
 
 def init_board(col, row):
     board = []
     index = 0
 
-    while index < col:
+    while index < row:
         board.append([])
         index2 = 0
 
-        while index2 < row:
+        while index2 < col:
             board[index].append("#")
             index2 += 1
         index += 1
