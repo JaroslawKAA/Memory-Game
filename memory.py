@@ -1,7 +1,9 @@
 import os
 import string
 import random
-
+from colorama import *
+from copy import deepcopy
+import winsound
 
 def difficulty_level():
     print(""" 
@@ -13,11 +15,12 @@ def difficulty_level():
     3. Hard""")
 
     choice = input("Your pick is: ")
+    winsound.Beep(500, 150)
 
     while choice not in ["1", "2", "3"]:
         print("Choose correct answer (1, 2 or 3)")
         choice = input("Your pick is: ")
-
+        winsound.Beep(500, 150)
     if choice == "1":
         return 5, 4
     elif choice == "2":
@@ -28,29 +31,41 @@ def difficulty_level():
 
 def get_random_letters(letters, board):
     letters_list = [char for char in letters]
+    letters_list.extend(letters_list)
     random.shuffle(letters_list)
     index = 0
-    last_index = len(letters_list)
-
+    
     for i in range(len(board)):
         for j in range(len(board[0])):
             board[i][j] = letters_list[index]
             index += 1
-            if index >= last_index:
-                index = 0
-                random.shuffle(letters_list)
 
+def color_string(color, string):
+    return color + string + Fore.RESET
+
+def color_board(color, board):
+
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] != "#":
+                board[i][j] = color_string(color, board[i][j])
+
+            
 
 def display_board(board):
     length = len(board[0])
-    header = string.ascii_uppercase[:length]
+    header = color_string(Fore.BLUE, string.ascii_uppercase[:length])
 
     print("\n  " + header)
 
     index = 1
 
-    for row in board:
-        row_to_print = str(index) + " " + "".join(row)
+    temp_board = deepcopy(board) 
+
+    color_board(Fore.GREEN, temp_board)
+
+    for row in temp_board:
+        row_to_print = color_string(Fore.BLUE, str(index)) + " " + "".join(row)
         print(row_to_print)
         index += 1
 
@@ -61,9 +76,11 @@ def get_coords(col, row):
     rows = list(map(lambda x: str(x + 1), rows))
 
     user_input = input("Provide your coords (Eg. a1, b4, etc...): ")
+    winsound.Beep(500, 150)
     while len(user_input) != 2 or user_input[0].lower() not in cols or user_input[1] not in rows:
         print("Incorrect answer. Try again!")
         user_input = input("Provide your coords (Eg. a1, b4, etc...): ")
+        winsound.Beep(500, 150)
 
     x = ord(user_input[0].lower()) - 97
     y = int(user_input[1]) - 1
@@ -104,15 +121,20 @@ def main():
 
         coords1 = get_coords(col, row)
         uncover_item(hidden_board, visible_board, coords1)
+        os.system("cls || clear")
         display_board(visible_board)
 
         coords2 = get_coords(col, row)
         uncover_item(hidden_board, visible_board, coords2)
+        os.system("cls || clear")
         display_board(visible_board)
 
         if visible_board[coords1[0]][coords1[1]] != visible_board[coords2[0]][coords2[1]]:
             hash_items(coords1, coords2, visible_board)
-            input("Letters unmatched! Try again!")
+            input(Fore.RED + "Letters unmatched! Try again! Press ENTER to continue... " + Fore.RESET)
+        else:
+            input(Fore.GREEN + "Congratulations! U hit a pair of items! Press ENTER to continue... " + Fore.RESET)
+
 
 
 def init_board(col, row):
